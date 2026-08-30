@@ -39,8 +39,10 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
+# pkgdown site (retain the hand-written architecture document)
+docs/*
+!docs/
+!docs/architecture.md
 
 # translation temp files
 po/*~
