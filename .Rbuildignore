@@ -1,0 +1,6 @@
+^\.git$
+^\.gitignore$
+^\.Rbuildignore$
+^\.Rcheck$
+^\.Rproj\.user$
+^docs/architecture\.md$
