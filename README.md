@@ -76,6 +76,22 @@ If the raw surface has `NA` cells outside the target footprint but inside the or
 
 The separate real-data smoke script uses one source and one target pair so the full-size `gdistance` calculation remains bounded in routine development; the asset-based tests still exercise the complete study geometry and surface preparation. The repository-level TIFFs are excluded from the installed package payload.
 
+## Asset-based demonstration
+
+For a presentation-oriented walkthrough using `assets/template.tif` and `assets/surface.tif`, run:
+
+```r
+source("scripts/asset-demo.R")
+```
+
+or from a terminal:
+
+```powershell
+Rscript scripts/asset-demo.R
+```
+
+The script prints raster and passage diagnostics, displays the input rasters, experimental geometry, computational passage, final target-domain passage, and a comparison figure. It uses one source and one target by default so the full-resolution `gdistance` calculation remains suitable for a live demonstration. Adjust `n_nodes` near the top of the script to explore larger experiments; the number of pairwise calculations grows as `n_nodes^2`.
+
 For a quick local check from the RStudio project, run:
 
 ```r
