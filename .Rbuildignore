@@ -1,6 +1,8 @@
-^\.git$
+^\.git
 ^\.gitignore$
 ^\.Rbuildignore$
-^\.Rcheck$
+^\.Rcheck($|/)
 ^\.Rproj\.user$
+^assets($|/)
 ^docs/architecture\.md$
+^scripts($|/)

@@ -45,6 +45,45 @@ result$computational_passage         # retained for diagnostics
 
 `traverse` does not choose universal conductance transformations, environmental weights, resistance floors, or scientifically optimal `theta` and geographic-correction values. Those decisions remain configurable for the study design.
 
+## Realistic repository assets
+
+The repository also contains `assets/template.tif` and `assets/surface.tif` for development integration checks. They share a projected Albers grid with kilometer map units (`24.99502 × 24.94366` map units per cell). In `template.tif`, `0` means an included target cell and `NA` means outside the target; the zero value has no movement meaning. In `surface.tif`, larger values indicate greater suitability/preference and therefore conceptually greater conductance. The raw surface is not normalized automatically.
+
+The following is an illustrative configuration for those assets, not a recommended scientific calibration:
+
+```r
+library(terra)
+library(traverse)
+
+template <- rast("assets/template.tif")
+raw_surface <- rast("assets/surface.tif")
+domain <- traverse_domain(template, buffer = 150, buffer_units = "map")
+surface <- traverse_surface(
+  raw_surface, domain = domain, type = "conductance",
+  transform = function(x) x / 100, minimum = 0.01, outside_value = 0.01
+)
+sources <- traverse_nodes(domain, "south", distance = 100, n = 5)
+targets <- traverse_nodes(domain, "north", distance = 100, n = 5)
+result <- traverse(
+  surface, domain, sources = sources, targets = targets,
+  directions = 16, theta = 1, correction = "c",
+  scale_correction = TRUE, aggregation = "mean"
+)
+plot(result)
+```
+
+If the raw surface has `NA` cells outside the target footprint but inside the original rectangle, those cells remain barriers. An application that intends them to be traversable must make that choice explicitly before passage, as in the demonstration script [scripts/real-data-smoke-test.R](scripts/real-data-smoke-test.R). `scale_correction = TRUE` reproduces the historical `gdistance` `scl = TRUE` setting and changes the numerical scale that interacts with `theta`; neither the example `theta` nor the conductance transformation is a package default.
+
+The separate real-data smoke script uses one source and one target pair so the full-size `gdistance` calculation remains bounded in routine development; the asset-based tests still exercise the complete study geometry and surface preparation. The repository-level TIFFs are excluded from the installed package payload.
+
+For a geometry diagnostic, plot the domain first and overlay the two terminal sets:
+
+```r
+plot(domain)
+terra::plot(sources, add = TRUE, col = "#1B9E77", pch = 16)
+terra::plot(targets, add = TRUE, col = "#7570B3", pch = 16)
+```
+
 See [`docs/architecture.md`](docs/architecture.md) for the package data flow, object structure, backend boundary, and open methodological questions.
 
 ## Development
