@@ -1,0 +1,9 @@
+^\.git
+^\.gitignore$
+^\.Rbuildignore$
+^\.Rcheck($|/)
+^\.Rproj\.user$
+^assets($|/)
+^docs/architecture\.md$
+^scripts($|/)
+^.*\.Rproj$

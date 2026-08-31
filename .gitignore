@@ -39,11 +39,17 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
+# pkgdown site (retain the hand-written architecture document)
+docs/*
+!docs/
+!docs/architecture.md
 
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Local demo output
+local-demo-domain.png
+demo-output/

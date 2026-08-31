@@ -1,0 +1,25 @@
+Package: traverse
+Title: Spatial Passage Across Gridded Landscapes
+Version: 0.1.0
+Authors@R: person("John", "Humphreys", email = "john.humphreys@example.org", role = c("aut", "cre"))
+Author: John Humphreys [aut, cre]
+Maintainer: John Humphreys <john.humphreys@example.org>
+Description: Estimates spatial passage across gridded landscapes between source
+    and destination sets. The package separates a scientific target domain
+    from a buffered computational domain so terminal nodes can be placed
+    outside the area of interpretation.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    gdistance,
+    raster,
+    sp,
+    terra
+Suggests:
+    ggplot2,
+    patchwork,
+    sf,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
