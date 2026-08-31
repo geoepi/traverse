@@ -43,6 +43,9 @@ vignettes/*.pdf
 docs/*
 !docs/
 !docs/architecture.md
+!docs/asset-demo.md
+!docs/asset-demo_files/
+!docs/asset-demo_files/**
 
 # translation temp files
 po/*~
