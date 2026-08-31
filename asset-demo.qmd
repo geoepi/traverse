@@ -1,6 +1,6 @@
 ---
-title: "Traversing a gridded landscape"
-description: "A worked example of passage analysis with traverse"
+title: "Traversing a landscape"
+description: "Example of passage analysis with traverse"
 format:
   gfm:
     toc: true
@@ -14,21 +14,20 @@ execute:
   message: false
 ---
 
-`traverse` estimates relative passage across a gridded landscape between
-source and destination sets. This compact demonstration uses the package's
+`traverse` estimates relative passage potential across a gridded landscape between
+source and destination nodes. This demonstration uses the package's
 example rasters to show the full workflow: define a scientific target domain,
 expand it for computation, place terminals outside the target, and mask the
 result back to the area being interpreted.
 
 ## Landscape inputs
 
-The demonstration separates two ideas. The **target domain** is the set of
-cells for which passage will ultimately be interpreted. The **movement
-surface** describes relative suitability or preference across that landscape;
-higher values indicate easier or more preferred movement. In `template.tif`,
-finite `0` values mark included cells and `NA` marks cells outside the target.
-The zero is a mask value only; it is not a movement cost. In `surface.tif`,
-larger continuous values indicate greater suitability.
+The **target domain** is the set of cells for which passage will ultimately 
+be interpreted. The **movement surface** describes relative suitability or 
+preference across that landscape; higher values indicate easier or more preferred 
+movement. In `template.tif`, finite `0` values mark included cells and `NA` marks 
+cells outside the target. The zero is a mask value only; it is not a movement cost.
+In `surface.tif`, larger continuous values indicate greater suitability.
 
 ```{r}
 #| label: setup
