@@ -6,3 +6,4 @@
 ^assets($|/)
 ^docs/architecture\.md$
 ^scripts($|/)
+^.*\.Rproj$

@@ -49,3 +49,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Local demo output
+local-demo-domain.png

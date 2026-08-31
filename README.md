@@ -76,6 +76,14 @@ If the raw surface has `NA` cells outside the target footprint but inside the or
 
 The separate real-data smoke script uses one source and one target pair so the full-size `gdistance` calculation remains bounded in routine development; the asset-based tests still exercise the complete study geometry and surface preparation. The repository-level TIFFs are excluded from the installed package payload.
 
+For a quick local check from the RStudio project, run:
+
+```r
+source("scripts/local-demo.R")
+```
+
+This runs a fast synthetic end-to-end example, checks the target/computational geometries and terminal placement, and plots the external source and target nodes. Use `Rscript scripts/local-demo.R --save-plot` to save the diagnostic plot, or `Rscript scripts/local-demo.R --real` to run the larger asset-based smoke test afterward.
+
 For a geometry diagnostic, plot the domain first and overlay the two terminal sets:
 
 ```r
