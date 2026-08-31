@@ -20,6 +20,7 @@ traverse(
   directions = 16,
   theta = 1,
   correction = "c",
+  scale_correction = TRUE,
   aggregation = "mean",
   workers = 1
 )
@@ -54,6 +55,10 @@ traverse(
 \item{theta}{Randomized-shortest-path parameter.}
 
 \item{correction}{Geographic correction passed to \code{gdistance}, or \code{NULL}.}
+
+\item{scale_correction}{Logical; whether geographic-correction scaling is
+applied. \code{TRUE} reproduces the historical prototype behavior and changes
+the numerical scale that interacts with \code{theta}.}
 
 \item{aggregation}{Pair aggregation method, \code{"mean"} or \code{"sum"}.}
 

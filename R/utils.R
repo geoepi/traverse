@@ -160,6 +160,12 @@ traverse_backend_raster <- function(surface) {
     }
     v[is.finite(v)] <- 1 / v[is.finite(v)]
     terra::values(r) <- v
+  } else if (any(is.finite(v) & v <= 0)) {
+    traverse_stop(paste(
+      "The conductance surface contains finite non-positive values.",
+      "Use minimum=, transform=, or NA barriers to define their",
+      "movement interpretation before passage calculation."
+    ))
   }
   if (!any(is.finite(v) & v > 0)) {
     traverse_stop("The movement surface must contain at least one positive finite value.")
@@ -167,7 +173,8 @@ traverse_backend_raster <- function(surface) {
   raster::raster(r)
 }
 
-traverse_validate_model <- function(directions, theta, correction, workers) {
+traverse_validate_model <- function(directions, theta, correction, workers,
+                                    scale_correction = TRUE) {
   if (length(directions) != 1L || !is.finite(directions) ||
       directions != as.integer(directions) || !directions %in% c(4L, 8L, 16L)) {
     traverse_stop("directions must be one of 4, 8, or 16.")
@@ -175,8 +182,13 @@ traverse_validate_model <- function(directions, theta, correction, workers) {
   if (length(theta) != 1L || !is.finite(theta) || theta <= 0) {
     traverse_stop("theta must be a single positive finite number.")
   }
-  if (!is.null(correction) && (length(correction) != 1L || !is.character(correction))) {
-    traverse_stop("correction must be a single character value or NULL.")
+  if (!is.null(correction) && (length(correction) != 1L || !is.character(correction) ||
+                               !correction %in% c("c", "r"))) {
+    traverse_stop("correction must be one of 'c', 'r', or NULL.")
+  }
+  if (length(scale_correction) != 1L || !is.logical(scale_correction) ||
+      is.na(scale_correction)) {
+    traverse_stop("scale_correction must be TRUE or FALSE.")
   }
   if (length(workers) != 1L || !is.finite(workers) || workers < 1L ||
       workers != as.integer(workers)) {

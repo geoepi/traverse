@@ -36,4 +36,8 @@ its semantic type, and provenance metadata.
 Conductance expresses ease of movement (higher values are easier); resistance
 expresses movement cost (higher values are harder). No normalization or
 project-specific multiplication is performed automatically.
+Finite zero values are retained as raw/prepared surface data. Before passage,
+finite conductance values must be made strictly positive with an explicit
+\code{minimum}, \code{transform}, or \code{NA} barrier decision; the backend never assigns a
+conductance floor silently.
 }

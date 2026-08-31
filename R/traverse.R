@@ -19,6 +19,9 @@
 #' @param directions Neighborhood size for the transition model.
 #' @param theta Randomized-shortest-path parameter.
 #' @param correction Geographic correction passed to `gdistance`, or `NULL`.
+#' @param scale_correction Logical; whether geographic-correction scaling is
+#'   applied. `TRUE` reproduces the historical prototype behavior and changes
+#'   the numerical scale that interacts with `theta`.
 #' @param aggregation Pair aggregation method, `"mean"` or `"sum"`.
 #' @param workers Explicit worker count; defaults to one.
 #' @return A `traverse_result` object containing both target and computational
@@ -29,18 +32,21 @@ traverse <- function(surface, domain, sources = NULL, targets = NULL, pairs = NU
                      node_distance = NULL, n = NULL,
                      placement = "even", allocation = "equal", seed = NULL,
                      directions = 16, theta = 1, correction = "c",
+                     scale_correction = TRUE,
                      aggregation = "mean", workers = 1) {
   if (!inherits(domain, "traverse_domain")) traverse_stop("domain must be a traverse_domain object.")
+  restore_rng <- traverse_rng_restore(seed)
+  on.exit(restore_rng(), add = TRUE)
   if (is.null(sources) || is.null(targets)) {
     if (is.null(node_distance) || is.null(n)) {
       traverse_stop("node_distance and n are required when sources or targets are omitted.")
     }
     if (is.null(sources)) sources <- traverse_nodes(domain, side = source_side,
                                                     distance = node_distance, n = n,
-                                                    placement = placement, allocation = allocation, seed = seed)
+                                                    placement = placement, allocation = allocation, seed = NULL)
     if (is.null(targets)) targets <- traverse_nodes(domain, side = target_side,
                                                     distance = node_distance, n = n,
-                                                    placement = placement, allocation = allocation, seed = seed)
+                                                    placement = placement, allocation = allocation, seed = NULL)
   }
   surface_obj <- if (inherits(surface, "traverse_surface")) {
     if (!is.null(surface$domain) && !traverse_grid_equal(surface$raster, domain$computational_template)) {
@@ -57,8 +63,8 @@ traverse <- function(surface, domain, sources = NULL, targets = NULL, pairs = NU
   }
   computational <- traverse_passage(
     surface_obj, sources, targets, pairs = pairs, directions = directions,
-    theta = theta, correction = correction, aggregation = aggregation,
-    workers = workers
+    theta = theta, correction = correction, scale_correction = scale_correction,
+    aggregation = aggregation, workers = workers
   )
   metadata <- attr(computational, "traverse_passage")
   if (is.null(metadata)) traverse_stop("Passage metadata were not retained.")
@@ -74,7 +80,8 @@ traverse <- function(surface, domain, sources = NULL, targets = NULL, pairs = NU
       surface = surface_obj,
       model = list(
         directions = directions, theta = theta, correction = correction,
-        aggregation = aggregation, workers = workers
+        scale_correction = scale_correction, aggregation = aggregation,
+        workers = workers
       )
     ),
     class = "traverse_result"

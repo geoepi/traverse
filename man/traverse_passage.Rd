@@ -12,6 +12,7 @@ traverse_passage(
   directions = 16,
   theta = 1,
   correction = "c",
+  scale_correction = TRUE,
   aggregate = TRUE,
   aggregation = c("mean", "sum"),
   workers = 1
@@ -33,6 +34,12 @@ traverse_passage(
 
 \item{correction}{Geographic correction type passed to \code{gdistance}, or
 \code{NULL} to omit correction.}
+
+\item{scale_correction}{Logical; whether to apply \code{gdistance} geographic
+correction scaling. \code{TRUE} reproduces the historical prototype behavior
+and interacts with the interpretation of \code{theta}. Scaling changes the
+numerical scale of corrected transition values and can be disabled with
+\code{FALSE}.}
 
 \item{aggregate}{Logical; if \code{TRUE}, return an aggregated raster. If
 \code{FALSE}, return pairwise rasters and metadata.}
