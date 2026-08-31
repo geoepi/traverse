@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="images/traverse_hex.png" width="350" alt="hex sticker">
+</p>
+  
+
 # traverse
 
 `traverse` estimates spatial passage across gridded landscapes between user-defined source and destination sets. It separates the scientific target domain from a buffered computational domain, allowing terminal nodes to be placed outside the area of interpretation and removed cleanly from final outputs.
