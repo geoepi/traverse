@@ -83,7 +83,9 @@ The separate real-data smoke script uses one source and one target pair so the f
 
 ## Asset-based demonstration
 
-For a presentation-oriented walkthrough using `assets/template.tif` and `assets/surface.tif`, run:
+For a human-readable, rendered walkthrough using `assets/template.tif` and `assets/surface.tif`, see [asset-demo.md](asset-demo.md). The reproducible Quarto source is [asset-demo.qmd](asset-demo.qmd); render it with `quarto render asset-demo.qmd`.
+
+The original script remains useful as a development reference:
 
 ```r
 source("scripts/asset-demo.R")
