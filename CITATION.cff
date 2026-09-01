@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "traverse: Spatial Passage Across Gridded Landscapes"
+type: software
+authors:
+  - family-names: Humphreys
+    given-names: John
+version: 0.1.0
+date-released: "2026-09-01"
+repository-code: "https://github.com/geoepi/traverse"
+url: "https://github.com/geoepi/traverse"
+license: MIT
+abstract: >-
+  Estimates randomized passage and connectivity across gridded landscapes,
+  distinguishing a target study domain from a buffered computational domain.

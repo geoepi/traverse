@@ -39,6 +39,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
+# GeoEpi project-local configuration
+.geoepi.yml
+
 # pkgdown site (retain the hand-written architecture document)
 docs/*
 !docs/

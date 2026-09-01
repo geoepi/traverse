@@ -2,6 +2,7 @@
 ^\.geoepi\.yml$
 ^\.gitignore$
 ^\.Rbuildignore$
+^CITATION[.]cff$
 ^\.Rcheck($|/)
 ^\.Rproj\.user$
 ^assets($|/)
