@@ -46,9 +46,8 @@ docs/*
 !docs/asset-demo.md
 !docs/asset-demo_files/
 !docs/asset-demo_files/**
-!docs/historical-equivalence.md
-!docs/historical-equivalence_files/
-!docs/historical-equivalence_files/**
+docs/historical-equivalence.md
+docs/historical-equivalence_files/
 
 # translation temp files
 po/*~

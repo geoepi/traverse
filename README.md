@@ -84,7 +84,7 @@ The separate real-data smoke script uses one source and one target pair so the f
 ## Demonstrations
 
 - [Traversing a landscape](docs/asset-demo.md)
-- [Historical equivalence validation](docs/historical-equivalence.md)
+- [Historical equivalence validation](historical-equivalence.qmd)
 
 ## Asset-based demonstration
 
