@@ -1,0 +1,270 @@
+---
+title: "Validating traverse against the historical workflow"
+description: "Quantitative equivalence of passage calculations"
+format:
+  gfm:
+    toc: true
+    toc-depth: 2
+    code-fold: show
+    code-summary: "Show code"
+    preview-mode: raw
+editor: source
+execute:
+  warning: false
+  message: false
+---
+
+`traverse` was extracted from a working landscape-connectivity workflow. This
+note validates the documented historical configuration against that original
+implementation before the package is generalized to broader applications.
+
+## Why validate equivalence?
+
+This is software/model equivalence validation, not a claim that the historical
+workflow was scientifically optimal. The comparison holds the landscape,
+conductance values, terminal coordinates, pairings, transition settings,
+passage settings, and target mask constant. The historical implementation is
+run directly with `raster`, `sp`, and `gdistance`; the new implementation keeps
+those classes behind the `traverse` API.
+
+```{r}
+#| label: setup
+#| include: false
+pkgload::load_all(".", quiet = TRUE)
+library(terra)
+library(ggplot2)
+library(patchwork)
+library(traverse)
+
+validation_env <- new.env(parent = globalenv())
+options(traverse.skip_historical_validation = TRUE)
+sys.source(
+  file.path("scripts", "validate-historical-nws.R"),
+  envir = validation_env
+)
+options(traverse.skip_historical_validation = FALSE)
+validation <- validation_env$run_historical_validation(
+  root = normalizePath(".", mustWork = TRUE),
+  n_nodes = 2L,
+  write_figures = FALSE
+)
+template <- validation$template
+raw_surface <- validation$raw_surface
+domain <- validation$domain
+surface <- validation$surface
+sources <- validation$sources
+targets <- validation$targets
+pairs <- validation$pairs
+```
+
+## Shared landscape and parameters
+
+The repaired repository assets provide a controlled proxy for the historical
+application. Finite cells in `template.tif` define the target study area, and
+the surface has no missing values in those finite target cells. Missing cells
+outside the target are assigned the same low conductance in both workflows.
+
+```{r}
+#| label: settings-table
+knitr::kable(
+  validation$settings_table,
+  caption = "Inputs and settings held constant between implementations."
+)
+```
+
+The target raster is extended by a 150 map-unit computational buffer. The
+surface is transformed as `x / 100`, given a finite minimum conductance of
+`0.01`, and assigned `0.01` in the non-target computational area. Two source
+and two target terminals create four source-target passage pairs. The
+validation function accepts a larger `n_nodes` value when a full 3 x 3 run is
+practical on the host system.
+
+## Shared terminals
+
+The terminal coordinates are generated once with `traverse_nodes()` and passed
+unchanged to both implementations. This is important: independently
+regenerating "equivalent" terminals could introduce a geometry difference that
+would be mistaken for a model difference.
+
+```{r}
+#| label: terminals-figure
+#| fig-cap: "The same source and target coordinates are supplied to the historical and traverse implementations. The red rectangle is the target extent; the grey rectangle is the computational extent."
+validation$plots$terminals
+```
+
+## Historical implementation
+
+The reference path converts the prepared conductance surface to a legacy
+`RasterLayer`, creates a 16-neighbour transition layer, applies
+`geoCorrection(type = "c", multpl = FALSE, scl = TRUE)`, calculates passage for
+each of the four pairs with `theta = 1e-100`, averages those pairwise rasters,
+and masks the aggregate back to the target.
+
+```{r}
+#| label: historical-code
+#| eval: false
+legacy_raster <- raster::raster(surface$raster)
+raster::crs(legacy_raster) <- terra::crs(surface$raster, proj = TRUE)
+legacy_transition <- gdistance::transition(
+  legacy_raster, transitionFunction = mean, directions = 16
+)
+legacy_transition <- gdistance::geoCorrection(
+  legacy_transition, type = "c", multpl = FALSE, scl = TRUE
+)
+
+source_sp <- sp::SpatialPoints(
+  terra::crds(sources),
+  proj4string = sp::CRS(terra::crs(sources, proj = TRUE))
+)
+target_sp <- sp::SpatialPoints(
+  terra::crds(targets),
+  proj4string = sp::CRS(terra::crs(targets, proj = TRUE))
+)
+legacy_pairwise <- lapply(seq_len(nrow(pairs)), function(i) {
+  gdistance::passage(
+    legacy_transition,
+    origin = source_sp[pairs$source_index[i], , drop = FALSE],
+    goal = target_sp[pairs$target_index[i], , drop = FALSE],
+    theta = 1e-100
+  )
+})
+legacy_mean <- raster::calc(
+  raster::stack(legacy_pairwise),
+  fun = function(x) if (all(is.na(x))) NA_real_ else mean(x, na.rm = TRUE)
+)
+legacy_target <- raster::mask(
+  raster::crop(legacy_mean, raster::raster(domain$target_template)),
+  raster::raster(domain$target_mask)
+)
+```
+
+## `traverse` implementation
+
+The equivalent `traverse` call receives the same prepared surface, domain,
+terminals, pair table, and model settings. The package converts to legacy
+backend classes only inside its transition and passage adapters.
+
+```{r}
+#| label: traverse-code
+#| eval: false
+traverse_result <- traverse(
+  surface,
+  domain,
+  sources = sources,
+  targets = targets,
+  pairs = pairs,
+  directions = 16,
+  theta = 1e-100,
+  correction = "c",
+  scale_correction = TRUE,
+  aggregation = "mean"
+)
+```
+
+The development validation script runs both code paths and fails if the core
+acceptance criteria are not met. It also records elapsed time for each path;
+runtime is informational here and is not used to claim an optimization.
+
+## Spatial comparison
+
+The historical and `traverse` maps use identical scale limits. The difference
+map is signed (`traverse - historical`) and uses a restrained diverging scale
+centered at zero.
+
+```{r}
+#| label: passage-comparison
+#| fig-cap: "Historical and traverse target-domain passage surfaces shown on identical colour scales."
+validation$plots$passage
+```
+
+```{r}
+#| label: difference-map
+#| fig-cap: "Signed cell-by-cell difference between the traverse and historical target-domain passage surfaces."
+validation$plots$difference
+```
+
+## Numerical equivalence
+
+Raster geometry includes dimensions, resolution, extent, CRS, and the finite
+target mask. Values are compared only where both outputs are finite, with
+relative metrics excluding reference values effectively equal to zero.
+
+```{r}
+#| label: raster-summary
+knitr::kable(
+  validation$summary_table,
+  digits = 8,
+  caption = "Target-domain raster summaries."
+)
+```
+
+```{r}
+#| label: equivalence-metrics
+metric_names <- c(
+  "pearson", "spearman", "rmse", "mae",
+  "maximum_absolute_difference", "mean_absolute_difference",
+  "normalized_rmse", "relative_rmse", "relative_maximum_difference",
+  "percent_cells_within_tolerance"
+)
+metric_table <- validation$metrics_table[
+  match(metric_names, validation$metrics_table$Metric), , drop = FALSE
+]
+knitr::kable(
+  metric_table,
+  digits = 12,
+  caption = "Cell-by-cell equivalence metrics."
+)
+```
+
+```{r}
+#| label: geometry-summary
+geometry_table <- data.frame(
+  Check = c("Geometry identical", "Finite target mask identical", "Acceptance criteria"),
+  Result = c(
+    validation$comparison$geometry_identical,
+    validation$comparison$finite_mask_identical,
+    validation$comparison$acceptance
+  )
+)
+knitr::kable(geometry_table, caption = "Structural equivalence checks.")
+```
+
+## Cell-by-cell comparison
+
+The scatter plot provides a direct check of the one-to-one relationship between
+the two output rasters. The dashed line is the identity line.
+
+```{r}
+#| label: scatter
+#| fig-cap: "Historical passage values versus traverse passage values for every finite target cell."
+validation$plots$scatter
+```
+
+## Interpretation
+
+```{r}
+#| label: interpretation
+interpretation <- if (isTRUE(validation$comparison$acceptance)) {
+  paste(
+    "For this documented historical configuration, traverse reproduces the",
+    "reference gdistance passage workflow within the reported numerical",
+    "tolerance. Geometry and finite target masks are identical, and the",
+    "cell-by-cell residuals are within tolerance. This conclusion is limited",
+    "to the tested conductance preparation, terminal geometry, pair weighting,",
+    "and gdistance settings."
+  )
+} else {
+  paste(
+    "The configured equivalence criteria were not met. Inspect the numerical",
+    "metrics and signed difference map before changing package behavior."
+  )
+}
+interpretation
+```
+
+The historical NWS application motivates this validation, but no NWS-specific
+transformation is embedded in the package API. For the documented historical
+configuration, the package architecture has now been checked against the
+legacy implementation while retaining explicit control over conductance,
+terminal placement, transition settings, geographic correction, and pair
+aggregation.

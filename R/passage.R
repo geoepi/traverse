@@ -120,6 +120,17 @@ traverse_passage <- function(surface, sources, targets, pairs = NULL,
       count_values[count_values > 0]
   }
   output_values[count_values == 0] <- NA_real_
+  finite_output <- output_values[is.finite(output_values)]
+  if (length(finite_output) > 0L && all(finite_output == 0)) {
+    warning(
+      paste(
+        "Passage returned all zeros despite a valid source-target setup;",
+        "check theta, conductance scaling, and geographic-correction settings",
+        "for numerical degeneration."
+      ),
+      call. = FALSE
+    )
+  }
   output <- running_sum
   terra::values(output) <- output_values
   attr(output, "traverse_passage") <- list(

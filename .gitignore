@@ -46,6 +46,8 @@ docs/*
 !docs/asset-demo.md
 !docs/asset-demo_files/
 !docs/asset-demo_files/**
+docs/historical-equivalence.md
+docs/historical-equivalence_files/
 
 # translation temp files
 po/*~
@@ -56,5 +58,6 @@ rsconnect/
 # Local demo output
 local-demo-domain.png
 demo-output/
+validation-output/
 
 /.quarto/

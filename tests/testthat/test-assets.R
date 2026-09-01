@@ -41,6 +41,12 @@ test_that("asset surface preparation is explicit and backend-ready", {
   template <- terra::rast(asset_file("template.tif"))
   raw_surface <- terra::rast(asset_file("surface.tif"))
   expect_true(terra::compareGeom(template, raw_surface, stopOnError = FALSE))
+  template_values <- terra::values(template, mat = FALSE)
+  raw_surface_values <- terra::values(raw_surface, mat = FALSE)
+  expect_equal(
+    sum(is.finite(template_values) & !is.finite(raw_surface_values)),
+    0L
+  )
   raw_prepared <- traverse_surface(raw_surface, type = "conductance")
   raw_idx <- which(is.finite(terra::values(raw_surface)))[1]
   expect_equal(terra::values(raw_prepared$raster)[raw_idx],

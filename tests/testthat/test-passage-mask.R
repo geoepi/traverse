@@ -34,3 +34,24 @@ test_that("high-level traverse retains both interpretations", {
                                  stopOnError = FALSE))
   expect_equal(nrow(result$pairs), 4)
 })
+
+test_that("all-zero passage emits a numerical-degeneration warning", {
+  template <- terra::rast(
+    nrows = 8, ncols = 8, xmin = 0, xmax = 8, ymin = 0, ymax = 8,
+    crs = "EPSG:3857"
+  )
+  terra::values(template) <- 0.01
+  domain <- traverse_domain(template, buffer = 2, buffer_units = "cells")
+  surface <- traverse_surface(template, domain = domain, outside_value = 0.01)
+  sources <- traverse_nodes(domain, "south", distance = 1, n = 1)
+  targets <- traverse_nodes(domain, "north", distance = 1, n = 1)
+
+  expect_warning(
+    result <- traverse_passage(
+      surface, sources, targets, directions = 4, theta = 1,
+      correction = "c", scale_correction = TRUE
+    ),
+    "Passage returned all zeros"
+  )
+  expect_true(all(terra::values(result, mat = FALSE) == 0))
+})

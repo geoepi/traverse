@@ -81,9 +81,14 @@ If the raw surface has `NA` cells outside the target footprint but inside the or
 
 The separate real-data smoke script uses one source and one target pair so the full-size `gdistance` calculation remains bounded in routine development; the asset-based tests still exercise the complete study geometry and surface preparation. The repository-level TIFFs are excluded from the installed package payload.
 
+## Demonstrations
+
+- [Traversing a landscape](docs/asset-demo.md)
+- [Historical equivalence validation](historical-equivalence.qmd)
+
 ## Asset-based demonstration
 
-For a human-readable, rendered walkthrough using `assets/template.tif` and `assets/surface.tif`, see [asset-demo.md](asset-demo.md). The reproducible Quarto source is [asset-demo.qmd](asset-demo.qmd); render it with `quarto render asset-demo.qmd`.
+For a human-readable, rendered walkthrough using `assets/template.tif` and `assets/surface.tif`, see [asset-demo.md](docs/asset-demo.md). The reproducible Quarto source is [asset-demo.qmd](asset-demo.qmd); render it with `quarto render asset-demo.qmd`.
 
 The original script remains useful as a development reference:
 
