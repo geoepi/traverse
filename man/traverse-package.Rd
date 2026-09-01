@@ -12,8 +12,16 @@ destinations obscure the area of interpretation. The computational result is
 retained for diagnostics, while the default interpreted result is masked back
 to the exact target template.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/geoepi/traverse}
+  \item Report bugs at \url{https://github.com/geoepi/traverse/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: John Humphreys \email{john.humphreys@example.org}
+\strong{Maintainer}: John Humphreys \email{JMHumphreys@users.noreply.github.com}
 
 }
 \keyword{internal}

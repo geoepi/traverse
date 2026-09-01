@@ -5,7 +5,18 @@
 
 # traverse
 
-`traverse` estimates spatial passage across gridded landscapes between user-defined source and destination sets. It separates the scientific target domain from a buffered computational domain, allowing terminal nodes to be placed outside the area of interpretation and removed cleanly from final outputs.
+`traverse` estimates randomized passage and connectivity across gridded landscapes. It distinguishes a target study domain from a larger buffered computational domain, supports external source and target terminals to reduce terminal artifacts, and returns passage intensity summarizing many possible routes rather than a single least-cost path.
+
+[![R-CMD-check](https://github.com/geoepi/traverse/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/geoepi/traverse/actions/workflows/R-CMD-check.yaml)
+
+## Installation
+
+Install the development version from GitHub:
+
+```r
+# install.packages("remotes")
+remotes::install_github("geoepi/traverse")
+```
 
 The package uses `terra::SpatRaster` and `terra::SpatVector` in its user-facing API. It currently uses `gdistance` as an internal randomized-shortest-path backend; legacy `raster`, `sp`, and `gdistance` classes are not required as user inputs.
 
@@ -121,6 +132,10 @@ terra::plot(targets, add = TRUE, col = "#7570B3", pch = 16)
 ```
 
 See [`docs/architecture.md`](docs/architecture.md) for the package data flow, object structure, backend boundary, and open methodological questions.
+
+## Citation
+
+To cite `traverse` in a publication, run `citation("traverse")` in R. Citation metadata are also available in [`CITATION.cff`](CITATION.cff).
 
 ## Development
 
