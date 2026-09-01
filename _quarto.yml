@@ -3,3 +3,4 @@ project:
   output-dir: docs
   render:
     - asset-demo.qmd
+    - historical-equivalence.qmd
