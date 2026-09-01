@@ -12,6 +12,28 @@ test_that("surface semantics and alignment are explicit", {
   expect_error(traverse_surface(x, d, outside_value = NULL), "outside_value")
 })
 
+test_that("target-domain surface NA values are reported and preserved", {
+  template <- terra::rast(
+    nrows = 5, ncols = 6, xmin = 0, xmax = 6, ymin = 0, ymax = 5,
+    crs = "EPSG:3857"
+  )
+  terra::values(template) <- 1
+  surface <- template
+  surface[3, 4] <- NA_real_
+  domain <- traverse_domain(template, buffer = 1, buffer_units = "cells")
+
+  expect_warning(
+    prepared <- traverse_surface(surface, domain = domain, outside_value = 1),
+    "Surface contains 1 NA cells inside the target domain"
+  )
+  target_cell <- terra::cellFromRowCol(surface, 3, 4)
+  cell <- terra::cellFromXY(
+    prepared$raster,
+    terra::xyFromCell(surface, target_cell)
+  )
+  expect_true(is.na(terra::values(prepared$raster, mat = FALSE)[cell]))
+})
+
 test_that("all source-target pairs are produced", {
   d <- make_domain()
   sources <- traverse_nodes(d, "south", 1, 3)

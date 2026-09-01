@@ -66,6 +66,21 @@ traverse_surface <- function(x, domain = NULL,
     if (!traverse_grid_equal(aligned, comp)) {
       traverse_stop("Could not align x to the computational domain without changing its grid.")
     }
+    target_on_computational <- terra::extend(
+      domain$target_mask, comp, fill = NA
+    )
+    aligned_values <- terra::values(aligned, mat = FALSE)
+    target_values <- terra::values(target_on_computational, mat = FALSE)
+    target_na <- sum(is.finite(target_values) & is.na(aligned_values))
+    if (target_na > 0L) {
+      warning(
+        sprintf(
+          "Surface contains %d NA cells inside the target domain; these cells will behave as movement barriers.",
+          target_na
+        ),
+        call. = FALSE
+      )
+    }
   } else {
     aligned <- x
   }
